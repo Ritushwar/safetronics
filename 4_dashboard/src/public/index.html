@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeTronics - Smart Helmet Monitoring Dashboard</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <i class="fas fa-hard-hat"></i>
+            <h1 id="main-heading">SafeTronics</h1>
+        </div>
+        <div class="header-info">
+            <div class="connection-status" id="connectionStatus">
+                <i class="fas fa-circle" id="connectionStatusDot"></i>
+                <span id="connectionStatusText">Connecting...</span>
+            </div>
+            <div class="datetime-container">
+                <div class="current-time" id="currentTime"></div>
+                <div class="current-date" id="currentDate"></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active" data-section="dashboard">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-item" data-section="workers">
+                    <i class="fas fa-users"></i>
+                    <span>Workers</span>
+                </a>
+                <a href="#" class="nav-item" data-section="alerts">
+                    <i class="fas fa-bell"></i>
+                    <span>Alerts</span>
+                    <span class="badge" id="alertBadge">0</span>
+                </a>
+                <a href="#" class="nav-item" data-section="history">
+                    <i class="fas fa-chart-line"></i>
+                    <span>History</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Section -->
+            <section id="dashboard-section" class="content-section active">
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #4caf50;">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalWorkers">0</h3>
+                            <p>Total Workers</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #2196f3;">
+                            <i class="fas fa-heartbeat"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="activeWorkers">0</h3>
+                            <p>Active Workers</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #ff9800;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="warningCount">0 <span class="alert-indicator" id="warningIndicator"></span></h3>
+                            <p>Fall Warning</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #f44336;">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="criticalCount">0 <span class="alert-indicator" id="criticalIndicator"></span></h3>
+                            <p>SOS Alerts</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #9c27b0;">
+                            <i class="fas fa-heartbeat"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="healthCount">0 <span class="alert-indicator" id="healthIndicator"></span></h3>
+                            <p>Health Alerts</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Real-Time Worker Monitoring -->
+                <div class="section-header">
+                    <h2>Real-Time Worker Monitoring</h2>
+                    <div class="section-actions">
+                        <button class="btn-secondary" onclick="refreshData()">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+                <div class="measurements-table-container">
+                    <table class="measurements-table" id="measurementsTable">
+                        <thead>
+                            <tr>
+                                <th>Worker ID</th>
+                                <th>Name</th>
+                                <th>Gender</th>
+                                <th>Body Temp (°C)</th>
+                                <th>Pulse Rate (BPM)</th>
+                                <th>SpO2 (%)</th>
+                                <th>Risk Level</th>
+                                <th>Last Updated</th>
+                            </tr>
+                        </thead>
+                        <tbody id="measurementsBody">
+                            <!-- Measurements data will be dynamically inserted here -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Recent Alerts -->
+                <div class="section-header">
+                    <h2>Recent Alerts</h2>
+                    <a href="#" class="view-all" onclick="switchSection('alerts')">View All</a>
+                </div>
+                <div class="alerts-container" id="recentAlerts">
+                    <!-- Recent alerts will be dynamically inserted here -->
+                </div>
+            </section>
+
+            <!-- Workers Section -->
+            <section id="workers-section" class="content-section">
+                <div class="section-header">
+                    <h2>All Workers</h2>
+                    <div class="section-actions">
+                        <input type="text" class="search-input" placeholder="Search workers..." id="workerSearch" oninput="filterWorkers()">
+                        <button class="add-worker-btn" onclick="openAddWorkerModal()">
+                            <i class="fas fa-plus"></i> Add Worker
+                        </button>
+                    </div>
+                </div>
+                <div class="workers-table-container">
+                    <table class="workers-table">
+                        <thead>
+                            <tr>
+                                <th>Worker ID</th>
+                                <th>Name</th>
+                                <th>Gender</th>
+                                <th>Height (m)</th>
+                                <th>Weight (kg)</th>
+                                <th>Age</th>
+                            </tr>
+                        </thead>
+                        <tbody id="workersTableBody">
+                            <!-- Worker rows will be dynamically inserted here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Alerts Section -->
+            <section id="alerts-section" class="content-section">
+                <div class="section-header">
+                    <h2>All Alerts</h2>
+                    <div class="section-actions">
+                        <button class="btn-secondary" onclick="clearAllAlerts()">
+                            <i class="fas fa-check-double"></i> Clear All
+                        </button>
+                    </div>
+                </div>
+                <div class="alerts-list" id="alertsList">
+                    <!-- Alerts will be dynamically inserted here -->
+                </div>
+            </section>
+
+            <!-- History Section -->
+            <section id="history-section" class="content-section">
+                <div class="section-header">
+                    <h2>Health History Analysis</h2>
+                    <div class="section-actions">
+                        <select class="filter-select" id="workerHistorySelect" onchange="loadWorkerHistory()">
+                            <option value="">Select Worker</option>
+                            <option value="all">All Workers (Compare)</option>
+                        </select>
+                        <select class="filter-select" id="daysFilter" onchange="loadWorkerHistory()">
+                            <option value="1">Last 1 Day</option>
+                            <option value="5">Last 5 Days</option>
+                            <option value="7" selected>Last 7 Days</option>
+                            <option value="15">Last 15 Days</option>
+                            <option value="30">Last 30 Days</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="analytics-grid">
+                    <div class="chart-card">
+                        <h3>Heart Rate Trends</h3>
+                        <canvas id="heartRateChart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>SpO2 Levels</h3>
+                        <canvas id="spo2Chart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Temperature Monitoring</h3>
+                        <canvas id="temperatureChart"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Fall/SOS/Risk Counts</h3>
+                        <canvas id="alertsChart"></canvas>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Worker History Modal -->
+    <div id="workerHistoryModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeHistoryModal()">&times;</span>
+            <div id="workerHistoryContent">
+                <!-- Worker history will be dynamically inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Worker Modal -->
+    <div id="addWorkerModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAddWorkerModal()">&times;</span>
+            <h2>Add New Worker</h2>
+            <form id="addWorkerForm">
+                <div class="form-group">
+                    <label for="fname">First Name *</label>
+                    <input type="text" id="fname" name="fname" required>
+                </div>
+                <div class="form-group">
+                    <label for="lname">Last Name *</label>
+                    <input type="text" id="lname" name="lname" required>
+                </div>
+                <div class="form-group">
+                    <label for="gender">Gender *</label>
+                    <select id="gender" name="gender" required>
+                        <option value="">Select Gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="height">Height (meters) *</label>
+                    <input type="number" id="height" name="height_m" step="0.01" min="0.5" max="3.0" required placeholder="e.g., 1.75">
+                </div>
+                <div class="form-group">
+                    <label for="weight">Weight (kg) *</label>
+                    <input type="number" id="weight" name="weight_kg" step="0.1" min="20" max="200" required placeholder="e.g., 70.5">
+                </div>
+                <div class="form-group">
+                    <label for="age">Age</label>
+                    <input type="number" id="age" name="age" min="16" max="100" placeholder="Optional">
+                </div>
+                <div class="form-group bmi-display">
+                    <label>BMI (calculated)</label>
+                    <div id="bmiValue">Enter height and weight to calculate</div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" onclick="closeAddWorkerModal()" class="btn-cancel">Cancel</button>
+                    <button type="submit" class="btn-submit">Add Worker</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Worker Details Modal -->
+    <div id="workerDetailsModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeWorkerDetailsModal()">&times;</span>
+            <div id="workerDetailsContent">
+                <!-- Worker details will be dynamically inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <!-- <script src="js/app.js"></script> -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="js/socket.js"></script>
+</body>
+</html>
